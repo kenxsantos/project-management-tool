@@ -11,18 +11,16 @@ import {
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import api from "@/lib/axios";
 import { useState } from "react";
+import axios from "axios";
 import { useRouter } from "next/navigation";
-import Cookies from "js-cookie";
-import { v4 as uuidv4 } from "uuid";
 
 export default function SignIn() {
-    const router = useRouter();
-    const [email, setEmail] = useState("");
+    const [user_id, setUser_Id] = useState("");
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
+    const router = useRouter();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -30,34 +28,30 @@ export default function SignIn() {
         setError("");
 
         try {
-            const user_id = uuidv4();
-            const res = await api.post("/test01/create_member", {
+            const res = await axios.post("/api/proxy/testlogin", {
                 user_id,
-                email,
                 password,
-            });
-
-            const token = res.data?.token;
-            if (token) {
-                localStorage.setItem("token", token);
-                Cookies.set("token", token, { expires: 7 }); // store for middleware
+            },
+                { withCredentials: true }
+            );
+            if (res.status === 201) {
+                document.cookie = `auth_token=${user_id}; path=/;`;
                 router.push("/projects");
-            } else {
-                setError("Invalid response from server.");
             }
+
         } catch (err: any) {
-            console.error(err);
-            setError(err.response?.data?.message || "Login failed. Try again.");
+            console.error(err)
+            setError(err.response?.data || "Unexpected error");
         } finally {
             setLoading(false);
         }
     };
-    return <div className="w-full mt-20 flex justify-center items-center">
-        <form onSubmit={handleSubmit}>
-            <Card className="w-full max-w-sm">
 
+    return <div className="w-full mt-20 flex justify-center items-center">
+        <Card className="w-full max-w-sm">
+            <form onSubmit={handleSubmit}>
                 <CardHeader>
-                    <CardTitle>Login to your account</CardTitle>
+                    <CardTitle>Login your account</CardTitle>
                     <CardDescription>
                         Enter your email below to login to your account
                     </CardDescription>
@@ -67,39 +61,44 @@ export default function SignIn() {
                         <div className="text-sm text-red-500 text-center">{error}</div>
                     )}
 
-                    <div className="flex flex-col gap-6">
+                    <div className="flex flex-col gap-6 mt-4">
                         <div className="grid gap-2">
-                            <Label htmlFor="email">Email</Label>
+                            <Label htmlFor="userId">User ID</Label>
                             <Input
-                                type="email"
-                                placeholder="Email"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
+                                type="text"
+                                placeholder="User ID"
+                                value={user_id}
+                                onChange={(e) => setUser_Id(e.target.value)}
                                 required
-                                id="email"
+                                id="userId"
                             />
                         </div>
                         <div className="flex flex-col gap-6">
-                            <Input id="password" type="password"
-                                placeholder="Password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                required
-                            />
+                            <div className="grid gap-2">
+                                <Label htmlFor="password">Password</Label>
+                                <Input
+                                    id="password"
+                                    type="password"
+                                    placeholder="Password"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    required
+                                />
+                            </div>
                         </div>
                     </div>
-
                 </CardContent>
-                <CardFooter className="flex-col">
+                <CardFooter className="flex-col mt-4">
                     <Button type="submit" className="w-full" disabled={loading}>
                         {loading ? "Signing in..." : "Sign In"}
                     </Button>
-                    <CardAction>
-                        <Button variant="link">Don&apos;t have an account? Sign Up</Button>
-                    </CardAction>
                 </CardFooter>
-            </Card>
-        </form>
+            </form>
+            <CardAction className="w-full flex items-center justify-center text-center">
+                <a href="sign-up" className="text-sm text-center">Don&apos;t have an account? Sign up</a>
+            </CardAction>
+        </Card>
+
     </div>
 
 }
