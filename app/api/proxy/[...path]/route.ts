@@ -55,6 +55,11 @@ export async function POST(req: NextRequest, ctx: any) {
 export async function PUT(req: NextRequest, ctx: any) {
   return proxy(req, ctx);
 }
+
+export async function PATCH(req: NextRequest, ctx: any) {
+  return proxy(req, ctx);
+}
+
 export async function DELETE(req: NextRequest, ctx: any) {
   return proxy(req, ctx);
 }
