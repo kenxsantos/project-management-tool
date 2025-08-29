@@ -1,5 +1,5 @@
 "use client"
-import axios from "axios";
+import Cookies from "js-cookie";
 import { useEffect, useState } from "react";
 import {
     Card,
@@ -24,22 +24,24 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea";
+import { createProject, fetchAllProjects } from "@/app/services/api";
+import { ToastContainer, toast } from 'react-toastify';
+import { Project } from "@/interfaces";
 
 export default function Home() {
-    interface Project {
-        id: string;
-        name: string;
-        description: string;
-        created_at: string;
-    }
     const [projects, setProjects] = useState<Project[]>([]);
     const [loading, setLoading] = useState(true);
+    const [name, setName] = useState("");
+    const [description, setDescription] = useState("");
+    const userId = Cookies.get("auth_token") ?? "";
+    const [open, setOpen] = useState(false);
 
     useEffect(() => {
-        const fetchProjects = async () => {
+        const getProjects = async () => {
+            setLoading(true);
             try {
-                const res = await axios.get("/api/proxy/test02/get_all_project");
-                setProjects(res.data?.data || []);
+                const projects = await fetchAllProjects();
+                setProjects(projects);
             } catch (err) {
                 console.error("Failed to fetch projects", err);
             } finally {
@@ -47,49 +49,89 @@ export default function Home() {
             }
         };
 
-        fetchProjects();
+        getProjects();
     }, []);
+
+    const handleAddProject = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setLoading(true);
+        setOpen(false);
+        try {
+            const res = await createProject(userId, name, description);
+
+            if (res.status === 201) {
+                toast.success("Project Added Successfully!", {
+                    position: "top-right"
+                });
+                setName("");
+                setDescription("");
+
+                const projects = await fetchAllProjects();
+                setProjects(projects);
+            }
+        } catch (err) {
+            console.error("Failed to add project", err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <>
             <div className="flex-col items-center justify-center">
+                <ToastContainer />
                 <header>
                     <p className="font-bold text-4xl uppercase mt-10 text-center">Project Management Tool</p>
                     <p className="text-gray-400 text-base text-center">by Ken Santos</p>
                 </header>
                 <div className="flex justify-between items-center mt-12 px-12">
                     <p className="text-3xl font-bold">Projects</p>
-                    <Dialog>
-                        <form>
-                            <DialogTrigger asChild>
-                                <Button>
-                                    <Plus />
-                                    New Project</Button>
-                            </DialogTrigger>
-                            <DialogContent className="sm:max-w-[425px]">
+                    <Dialog open={open} onOpenChange={setOpen}>
+                        <DialogTrigger asChild>
+                            <Button>
+                                <Plus />
+                                New Project</Button>
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-[425px]">
+                            <form onSubmit={handleAddProject}>
                                 <DialogHeader>
                                     <DialogTitle>Add New Project</DialogTitle>
                                     <DialogDescription>
                                         Add your new project here. Click save when you&apos;re done.
                                     </DialogDescription>
                                 </DialogHeader>
-                                <div className="grid gap-4">
+                                <div className="grid gap-4 mt-4">
                                     <div className="grid gap-3">
-                                        <Label htmlFor="name-1">Project Name</Label>
-                                        <Input id="name-1" name="name" />
+                                        <Label htmlFor="name">Project Name</Label>
+                                        <Input
+                                            type="text"
+                                            placeholder="Project Name"
+                                            value={name}
+                                            onChange={(e) => setName(e.target.value)}
+                                            required
+                                            id="name"
+                                            name="name" />
                                     </div>
                                     <div className="grid gap-3">
-                                        <Label htmlFor="username-1">Description</Label>
-                                        <Textarea placeholder="Type your description here." />
+                                        <Label htmlFor="description">Description</Label>
+                                        <Textarea
+                                            placeholder="Type your description here."
+                                            value={description}
+                                            onChange={(e) => setDescription(e.target.value)}
+                                            required
+                                            id="description"
+                                            name="description"
+                                        />
                                     </div>
                                 </div>
-                                <DialogFooter>
+                                <DialogFooter className="mt-8">
                                     <DialogClose asChild>
                                         <Button variant="outline">Cancel</Button>
                                     </DialogClose>
-                                    <Button type="submit">Save changes</Button>
+                                    <Button type="submit">Save</Button>
                                 </DialogFooter>
-                            </DialogContent>
-                        </form>
+                            </form>
+                        </DialogContent>
                     </Dialog>
                 </div>
                 {
