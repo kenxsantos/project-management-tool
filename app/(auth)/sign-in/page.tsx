@@ -14,6 +14,7 @@ import { Label } from "@/components/ui/label"
 import { useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import { toast, ToastContainer } from "react-toastify";
 
 export default function SignIn() {
     const [user_id, setUser_Id] = useState("");
@@ -37,6 +38,9 @@ export default function SignIn() {
             if (res.status === 201) {
                 document.cookie = `auth_token=${user_id}; path=/;`;
                 router.push("/projects");
+                toast.success("Project Added Successfully!", {
+                    position: "top-right"
+                });
             }
 
         } catch (err: any) {
@@ -47,58 +51,60 @@ export default function SignIn() {
         }
     };
 
-    return <div className="w-full mt-20 flex justify-center items-center">
-        <Card className="w-full max-w-sm">
-            <form onSubmit={handleSubmit}>
-                <CardHeader>
-                    <CardTitle>Login your account</CardTitle>
-                    <CardDescription>
-                        Enter your email below to login to your account
-                    </CardDescription>
-                </CardHeader>
-                <CardContent>
-                    {error && (
-                        <div className="text-sm text-red-500 text-center">{error}</div>
-                    )}
+    return (
+        <div className="w-full mt-20 flex justify-center items-center">
+            <ToastContainer />
+            <Card className="w-full max-w-sm">
+                <form onSubmit={handleSubmit}>
+                    <CardHeader>
+                        <CardTitle>Login your account</CardTitle>
+                        <CardDescription>
+                            Enter your email below to login to your account
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        {error && (
+                            <div className="text-sm text-red-500 text-center">{error}</div>
+                        )}
 
-                    <div className="flex flex-col gap-6 mt-4">
-                        <div className="grid gap-2">
-                            <Label htmlFor="userId">User ID</Label>
-                            <Input
-                                type="text"
-                                placeholder="User ID"
-                                value={user_id}
-                                onChange={(e) => setUser_Id(e.target.value)}
-                                required
-                                id="userId"
-                            />
-                        </div>
-                        <div className="flex flex-col gap-6">
+                        <div className="flex flex-col gap-6 mt-4">
                             <div className="grid gap-2">
-                                <Label htmlFor="password">Password</Label>
+                                <Label htmlFor="userId">User ID</Label>
                                 <Input
-                                    id="password"
-                                    type="password"
-                                    placeholder="Password"
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
+                                    type="text"
+                                    placeholder="User ID"
+                                    value={user_id}
+                                    onChange={(e) => setUser_Id(e.target.value)}
                                     required
+                                    id="userId"
                                 />
                             </div>
+                            <div className="flex flex-col gap-6">
+                                <div className="grid gap-2">
+                                    <Label htmlFor="password">Password</Label>
+                                    <Input
+                                        id="password"
+                                        type="password"
+                                        placeholder="Password"
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        required
+                                    />
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                </CardContent>
-                <CardFooter className="flex-col mt-4">
-                    <Button type="submit" className="w-full" disabled={loading}>
-                        {loading ? "Signing in..." : "Sign In"}
-                    </Button>
-                </CardFooter>
-            </form>
-            <CardAction className="w-full flex items-center justify-center text-center">
-                <a href="sign-up" className="text-sm text-center">Don&apos;t have an account? Sign up</a>
-            </CardAction>
-        </Card>
-
-    </div>
+                    </CardContent>
+                    <CardFooter className="flex-col mt-4">
+                        <Button type="submit" className="w-full" disabled={loading}>
+                            {loading ? "Signing in..." : "Sign In"}
+                        </Button>
+                    </CardFooter>
+                </form>
+                <CardAction className="w-full flex items-center justify-center text-center">
+                    <a href="sign-up" className="text-sm text-center">Don&apos;t have an account? Sign up</a>
+                </CardAction>
+            </Card>
+        </div>
+    );
 
 }
