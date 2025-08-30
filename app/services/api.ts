@@ -91,14 +91,14 @@ export const patchTask = async (
   taskId: number,
   name: string,
   status: string,
-  content: string
+  contents: string
 ) => {
   try {
     const res = await api.patch("/test03/patch_task", {
       task_id: taskId,
       name,
       status,
-      content,
+      contents,
     });
 
     return res.data;
@@ -120,6 +120,25 @@ export const fetchTasksLogs = async (task_id: number) => {
   } catch (err) {
     console.error("Failed to fetch task", err);
     return null;
+  }
+};
+
+export const createChangeLog = async (
+  task_id: number,
+  old_status: string,
+  new_status: string,
+  remark: string
+) => {
+  try {
+    const res = await api.post("/test04/create_changelog", {
+      task_id,
+      old_status,
+      new_status,
+      remark,
+    });
+    return res.data;
+  } catch (error) {
+    alert(`Error to Create Log ${error}`);
   }
 };
 
