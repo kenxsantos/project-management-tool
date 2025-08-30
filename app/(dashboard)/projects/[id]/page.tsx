@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Project } from "@/interfaces";
+import { Status } from "@/lib/status";
 import { Pencil } from "lucide-react";
 import { use, useEffect, useState } from "react";
 import { toast } from "react-toastify";
@@ -15,7 +16,6 @@ interface ProjectPageProps {
 }
 
 export default function ProjectPage({ params }: ProjectPageProps) {
-    const statuses = ["Todo", "In Progress", "Done"];
     const { id } = use(params);
     const projectId = parseInt(id);
     const [project, setProject] = useState<Project | null>(null);
@@ -108,7 +108,7 @@ export default function ProjectPage({ params }: ProjectPageProps) {
                 </div>
             )}
             <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {statuses.map((status) => (
+                {Object.values(Status).map((status) => (
                     <ColumnContainer key={status} status={status} project_id={projectId} />
                 ))}
             </div>
