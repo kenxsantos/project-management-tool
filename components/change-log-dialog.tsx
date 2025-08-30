@@ -56,32 +56,35 @@ export default function ChangeLogDialog({ taskId, taskName }: ChangeLogDialogPro
                     ) : changeLogs.length === 0 ? (
                         <p className="text-gray-500 text-sm">No Logs found</p>
                     ) : (
-                        changeLogs.map((log) => (
-                            <div key={log.id} className="mb-2 border rounded-md p-3 bg-gray-100 grid gap-2">
-                                <p className="text-right text-xs">
-                                    {
-                                        new Date(log.created_at).toLocaleString("en-US", {
-                                            month: "short",
-                                            day: "numeric",
-                                            year: "numeric",
-                                            hour: "numeric",
-                                            minute: "2-digit",
-                                            hour12: true,
-                                        })}</p>
-                                <div className="flex justify-between items-center border rounded-sm p-2">
-                                    <p className="text-right text-xs font-bold ">Status:</p>
-                                    <div className="flex justify-between items-center gap-3">
-                                        <p className="text-right text-xs text-red-700"><s>{log.old_status}</s></p>
-                                        <MoveRight />
-                                        <p className="text-right text-xs">{log.new_status}</p>
+                        changeLogs
+                            .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+                            .map((log) => (
+                                <div key={log.id} className="mb-2 border rounded-md p-3 bg-gray-100 grid gap-2">
+                                    <p className="text-right text-xs">
+                                        {
+                                            new Date(log.created_at).toLocaleString("en-US", {
+                                                month: "short",
+                                                day: "numeric",
+                                                year: "numeric",
+                                                hour: "numeric",
+                                                minute: "2-digit",
+                                                hour12: true,
+                                                timeZone: "Asia/Manila",
+                                            })}</p>
+                                    <div className="flex justify-between items-center border rounded-sm p-2">
+                                        <p className="text-right text-xs font-bold ">Status:</p>
+                                        <div className="flex justify-between items-center gap-3">
+                                            <p className="text-right text-xs text-red-700"><s>{log.old_status}</s></p>
+                                            <MoveRight />
+                                            <p className="text-right text-xs">{log.new_status}</p>
+                                        </div>
+                                    </div>
+                                    <div className="flex-col justify-left border rounded-sm p-2">
+                                        <p className="text-left text-xs font-bold">Remarks:</p>
+                                        <p className="text-left text-xs text-gray-500">{log.remark}</p>
                                     </div>
                                 </div>
-                                <div className="flex-col justify-left border rounded-sm p-2">
-                                    <p className="text-left text-xs font-bold">Remarks:</p>
-                                    <p className="text-left text-xs text-gray-500">{log.remark}</p>
-                                </div>
-                            </div>
-                        ))
+                            ))
                     )}
                     <DialogFooter>
                         <DialogClose asChild>
