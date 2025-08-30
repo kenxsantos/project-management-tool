@@ -38,7 +38,7 @@ export default function SignIn() {
             if (res.status === 201) {
                 document.cookie = `auth_token=${user_id}; path=/;`;
                 router.push("/projects");
-                toast.success("Project Added Successfully!", {
+                toast.success("Sign In Successfully!", {
                     position: "top-right"
                 });
             }
