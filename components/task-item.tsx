@@ -6,9 +6,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
-import { patchTask } from "@/app/services/api";
+import { createChangeLog, patchTask } from "@/app/services/api";
 import { toast } from "react-toastify";
-
+import { Status, StatusLabels } from "@/lib/status";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -26,17 +26,20 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
-import ChangeLogDialog from "./change-log-dialog";
+import ChangeLogDialog from "@/components/change-log-dialog";
+
 export default function TaskItem({ task }: { task: Task }) {
     const [newName, setNewName] = useState(task.name);
     const [newStatus, setNewStatus] = useState(task.status);
     const [newContent, setNewContent] = useState(task.contents);
     const [remarks, setRemarks] = useState("");
+    const taskId = parseInt(task.id);
 
     const handleEditTask = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            await patchTask(parseInt(task.id), newName, newStatus, newContent);
+            await patchTask(taskId, newName, newStatus, newContent);
+            await createChangeLog(taskId, task.status, newStatus, remarks);
             toast.success("Task Updated Successfully!", {
                 position: "top-right",
             });
@@ -91,8 +94,8 @@ export default function TaskItem({ task }: { task: Task }) {
                                     <div className="grid gap-3">
                                         <Label htmlFor="newContent">Status</Label>
                                         <Select
-                                            defaultValue="Todo"
-                                            onValueChange={(value) => setNewStatus(value)}
+                                            defaultValue={task.status}
+                                            onValueChange={(value) => setNewStatus(value as Status)}
                                             required
                                         >
                                             <SelectTrigger className="w-[180px]">
@@ -101,9 +104,15 @@ export default function TaskItem({ task }: { task: Task }) {
                                             <SelectContent>
                                                 <SelectGroup>
                                                     <SelectLabel>Status</SelectLabel>
-                                                    <SelectItem value="Todo">To Do</SelectItem>
-                                                    <SelectItem value="In Progress">In Progress</SelectItem>
-                                                    <SelectItem value="Done">Done</SelectItem>
+                                                    {Object.values(Status).map((status) => (
+                                                        <SelectItem
+                                                            key={status}
+                                                            value={status}
+                                                            disabled={status === task.status}
+                                                        >
+                                                            {StatusLabels[status]}
+                                                        </SelectItem>
+                                                    ))}
                                                 </SelectGroup>
                                             </SelectContent>
                                         </Select>
@@ -124,11 +133,8 @@ export default function TaskItem({ task }: { task: Task }) {
                             <DropdownMenuItem asChild>
                                 <ChangeLogDialog taskId={parseInt(task.id)} taskName={task.name} />
                             </DropdownMenuItem>
-
                         </DropdownMenuContent>
                     </DropdownMenu>
-
-
                 </div>
                 <p className="text-xs text-gray-600">{task.contents}</p>
                 <p className="text-xs text-gray-500 text-right">{task.status}</p>
