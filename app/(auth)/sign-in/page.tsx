@@ -43,12 +43,18 @@ export default function SignIn() {
                 });
             }
 
-        } catch (err: any) {
-            console.error(err)
-            setError(err.response?.data || "Unexpected error");
+        } catch (err: unknown) {
+            console.error(err);
+            if (err instanceof Error) {
+                const axiosErr = err as { response?: { data?: string } };
+                setError(axiosErr.response?.data || err.message || "Unexpected error");
+            } else {
+                setError("Unexpected error");
+            }
         } finally {
             setLoading(false);
         }
+
     };
 
     return (

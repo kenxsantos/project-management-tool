@@ -39,12 +39,17 @@ export default function SignIn() {
             );
             const message = res.data?.data; // 👈 capture backend message
             alert(message);
-        } catch (err: any) {
-            console.error(err)
-            setError(err.response?.data || "Unexpected error");
+        } catch (err: unknown) {
+            if (axios.isAxiosError(err)) {
+                setError(err.response?.data || "Unexpected error");
+            } else {
+                setError("Unexpected error");
+            }
+            console.error(err);
         } finally {
             setLoading(false);
         }
+
     };
 
     return <div className="w-full mt-20 flex justify-center items-center">

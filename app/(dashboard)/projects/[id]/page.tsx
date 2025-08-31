@@ -10,7 +10,7 @@ import { Status } from "@/lib/status";
 import { Pencil } from "lucide-react";
 import { use, useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { DndContext, DragOverlay, closestCorners } from "@dnd-kit/core";
+import { DndContext, DragEndEvent, DragOverEvent, DragOverlay, DragStartEvent, closestCorners } from "@dnd-kit/core";
 import { arrayMove } from "@dnd-kit/sortable";
 import TaskItem from "@/components/task-item";
 import { formatDate } from "@/lib/format-date";
@@ -63,24 +63,24 @@ export default function ProjectPage({ params }: ProjectPageProps) {
         }
     };
 
-    const handleDragStart = (event: any) => {
-        setActiveTaskId(event.active.id);
+    const handleDragStart = (event: DragStartEvent) => {
+        setActiveTaskId(Number(event.active.id));
     };
 
-    const handleDragOver = (event: any) => {
+    const handleDragOver = (event: DragOverEvent) => {
         const { over } = event;
         if (over) {
             if (over.data.current?.columnId) {
                 setOverTaskId(null);
             } else {
-                setOverTaskId(over.id);
+                setOverTaskId(Number(over.id));
             }
         } else {
             setOverTaskId(null);
         }
     };
 
-    const handleDragEnd = async (event: any) => {
+    const handleDragEnd = async (event: DragEndEvent) => {
         setActiveTaskId(null);
         setOverTaskId(null);
 
