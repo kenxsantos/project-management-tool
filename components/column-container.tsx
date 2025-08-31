@@ -11,8 +11,9 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button"
 import { Plus } from "lucide-react";
-import { useEffect, useState } from "react";
-import { createTask, fetchProjectTasks } from "@/app/services/api";
+import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import { useState } from "react";
+import { createTask } from "@/app/services/api";
 import {
     Dialog,
     DialogClose,
@@ -24,84 +25,77 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog"
 import { toast, ToastContainer } from "react-toastify";
-import { Task } from "@/interfaces";
 import TaskItem from "./task-item";
+import { Task } from "@/interfaces";
+import { useDroppable } from "@dnd-kit/core";
 interface ColumnContainerProps {
     status: string;
     project_id: number;
+    tasks: Task[];
+    onTaskAdded: (task: Task) => void;
 }
 
 
-export default function ColumnContainer({ status, project_id }: ColumnContainerProps) {
-    const [tasks, setTasks] = useState<Task[]>([]);
-    const [loading, setLoading] = useState(true);
+export default function ColumnContainer({ status, project_id, tasks, onTaskAdded }: ColumnContainerProps) {
     const [open, setOpen] = useState(false);
     const [name, setName] = useState("");
     const [content, setContent] = useState("");
+    const { setNodeRef } = useDroppable({
+        id: status,
+        data: { columnId: status },
+    });
 
-    useEffect(() => {
-        const getAllTasks = async () => {
-            setLoading(true);
-
-            try {
-                const filtered = await fetchProjectTasks(project_id, status);
-                setTasks(filtered);
-
-            } catch (err) {
-                console.error("Failed to fetch projects", err);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        getAllTasks();
-    }, [project_id, status]);
 
     const handleAddTask = async (e: React.FormEvent) => {
         e.preventDefault();
-        setLoading(true);
         setOpen(false);
         try {
             const res = await createTask(project_id, name, status, content);
 
             if (res.status === 201) {
                 toast.success("Task Added Successfully!", {
-                    position: "top-right"
+                    position: "top-right",
+                    autoClose: 2000,
+                    pauseOnHover: false,
                 });
+                const newTask: Task = {
+                    ...res.data.data,
+                };
+
+                onTaskAdded(newTask);
                 setName("");
                 setContent("");
-
-                const filtered = await fetchProjectTasks(project_id, status);
-                setTasks(filtered);
-
             }
         } catch (err) {
             console.error("Failed to add project", err);
-        } finally {
-            setLoading(false);
         }
     };
 
     return (
         <div>
             <ToastContainer />
-            <Card className="sm:w-[500px] md:w-[350px] lg:w-[500px]">
+            <Card className="sm:w-[500px] md:w-[350px] lg:w-[500px] " ref={setNodeRef}>
                 <CardHeader>
                     <CardTitle>{status}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    {loading ? (
-                        <p className="text-gray-400 text-sm">Loading...</p>
-                    ) : tasks.length === 0 ? (
+                    {tasks.length === 0 ? (
                         <p className="text-gray-500 text-sm">No Tasks found</p>
                     ) : (
-                        tasks.map((task) => (
-                            <TaskItem key={task.id} task={task} />
-                        ))
+                        <SortableContext
+                            items={tasks.map((t) => String(t.id))}
+                            strategy={verticalListSortingStrategy}
+                        >
+                            {tasks.map((task) => (
+                                <TaskItem key={String(task.id)} task={task} />
+                            ))}
+                        </SortableContext>
                     )}
                 </CardContent>
                 <CardFooter>
-                    <Dialog open={open} onOpenChange={setOpen}>
+                    <Dialog
+                        open={open}
+                        onOpenChange={setOpen}>
                         <DialogTrigger asChild>
                             <Button className="w-full">
                                 <Plus /> Add Task
