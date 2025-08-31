@@ -1,5 +1,5 @@
 "use client"
-import { fetchAllTasks, fetchProject, patchProject, patchTask } from "@/app/services/api";
+import { createChangeLog, fetchAllTasks, fetchProject, patchProject, patchTask } from "@/app/services/api";
 import ColumnContainer from "@/components/column-container";
 import FormDialog from "@/components/form-dialog";
 import { Input } from "@/components/ui/input";
@@ -130,12 +130,26 @@ export default function ProjectPage({ params }: ProjectPageProps) {
             });
 
             try {
+
+                const oldTask = tasks.find((t) => String(t.id) === String(activeTask.id));
+                const oldStatus = oldTask ? oldTask.status : null;
+
                 await patchTask(
                     Number(activeTask.id),
                     activeTask.name,
                     newStatus,
                     activeTask.contents
                 );
+
+
+                if (oldStatus && oldStatus !== newStatus) {
+                    await createChangeLog(
+                        Number(activeTask.id),
+                        oldStatus,
+                        newStatus,
+                        "Change Status"
+                    );
+                }
                 toast.success("Task Updated Successfully!", {
                     position: "top-right",
                     autoClose: 2000,
