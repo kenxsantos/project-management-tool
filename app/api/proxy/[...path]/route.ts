@@ -1,30 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest } from "next/server";
 
-async function proxy(
-  req: NextRequest,
-  context: { params: Promise<{ path: string[] }> }
-) {
-  const { path } = await context.params;
+const API_URL = "https://m-backend.dowinnsys.com";
+
+async function proxy(req: NextRequest, context: any) {
+  const { path } = (await context.params) as { path: string[] };
 
   const search = req.nextUrl.searchParams.toString();
+  const targetUrl = `${API_URL}/${path.join("/")}${search ? `?${search}` : ""}`;
 
-  // ✅ Safe fallback handling
-  const apiUrl =
-    process.env.API_URL?.replace(/\/$/, "") ||
-    "https://m-backend.dowinnsys.com"; // default if not set
-
-  if (!apiUrl) {
-    return new Response(
-      JSON.stringify({ error: "API_URL not defined in env" }),
-      { status: 500, headers: { "Content-Type": "application/json" } }
-    );
-  }
-
-  const targetUrl = `${apiUrl}/${path.join("/")}${search ? `?${search}` : ""}`;
-  console.log("🔀 Proxy forwarding to:", targetUrl);
-
-  // Forward headers
   const headers: HeadersInit = {};
   const forwardHeaders = ["content-type", "accept", "authorization"];
 
@@ -33,10 +17,9 @@ async function proxy(
     if (val) headers[h] = val;
   });
 
-  headers["Origin"] = apiUrl;
-  headers["Referer"] = apiUrl;
+  headers["Origin"] = API_URL;
+  headers["Referer"] = API_URL;
 
-  // Forward body if not GET/HEAD
   const body =
     req.method !== "GET" && req.method !== "HEAD"
       ? await req.text()
@@ -67,10 +50,10 @@ export async function GET(req: NextRequest, ctx: any) {
 export async function POST(req: NextRequest, ctx: any) {
   return proxy(req, ctx);
 }
-export async function PATCH(req: NextRequest, ctx: any) {
+export async function PUT(req: NextRequest, ctx: any) {
   return proxy(req, ctx);
 }
-export async function PUT(req: NextRequest, ctx: any) {
+export async function PATCH(req: NextRequest, ctx: any) {
   return proxy(req, ctx);
 }
 export async function DELETE(req: NextRequest, ctx: any) {
