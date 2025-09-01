@@ -3,15 +3,28 @@ import { NextRequest } from "next/server";
 
 async function proxy(
   req: NextRequest,
-  context: { params: { path: string[] } }
+  context: { params: Promise<{ path: string[] }> }
 ) {
-  const { path } = context.params;
+  const { path } = await context.params;
 
   const search = req.nextUrl.searchParams.toString();
-  const targetUrl = `${process.env.API_URL!.replace(/\/$/, "")}/${path.join(
-    "/"
-  )}${search ? `?${search}` : ""}`;
 
+  // ✅ Safe fallback handling
+  const apiUrl =
+    process.env.API_URL?.replace(/\/$/, "") ||
+    "https://m-backend.dowinnsys.com"; // default if not set
+
+  if (!apiUrl) {
+    return new Response(
+      JSON.stringify({ error: "API_URL not defined in env" }),
+      { status: 500, headers: { "Content-Type": "application/json" } }
+    );
+  }
+
+  const targetUrl = `${apiUrl}/${path.join("/")}${search ? `?${search}` : ""}`;
+  console.log("🔀 Proxy forwarding to:", targetUrl);
+
+  // Forward headers
   const headers: HeadersInit = {};
   const forwardHeaders = ["content-type", "accept", "authorization"];
 
@@ -20,27 +33,20 @@ async function proxy(
     if (val) headers[h] = val;
   });
 
-  headers["Origin"] = process.env.API_URL ?? "https://m-backend.dowinnsys.com";
-  headers["Referer"] = process.env.API_URL ?? "https://m-backend.dowinnsys.com";
+  headers["Origin"] = apiUrl;
+  headers["Referer"] = apiUrl;
 
+  // Forward body if not GET/HEAD
   const body =
     req.method !== "GET" && req.method !== "HEAD"
       ? await req.text()
       : undefined;
 
-  let response;
-  try {
-    response = await fetch(targetUrl, {
-      method: req.method,
-      headers,
-      body,
-    });
-  } catch (err: any) {
-    return new Response(
-      JSON.stringify({ error: "Proxy request failed", details: err.message }),
-      { status: 500, headers: { "Content-Type": "application/json" } }
-    );
-  }
+  const response = await fetch(targetUrl, {
+    method: req.method,
+    headers,
+    body,
+  });
 
   let resBody: unknown;
   try {
