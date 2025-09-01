@@ -2,7 +2,7 @@ import { ChangeLogs, Task } from "@/interfaces";
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || "/api/proxy",
+  baseURL: process.env.NEXT_PUBLIC_API_URL,
   withCredentials: true,
 });
 

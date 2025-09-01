@@ -3,14 +3,14 @@ import { NextRequest } from "next/server";
 
 async function proxy(
   req: NextRequest,
-  context: { params: Promise<{ path: string[] }> }
+  context: { params: { path: string[] } }
 ) {
-  const { path } = await context.params;
+  const { path } = context.params;
 
   const search = req.nextUrl.searchParams.toString();
-  const targetUrl = `${process.env.API_URL}/${path.join("/")}${
-    search ? `?${search}` : ""
-  }`;
+  const targetUrl = `${process.env.API_URL!.replace(/\/$/, "")}/${path.join(
+    "/"
+  )}${search ? `?${search}` : ""}`;
 
   const headers: HeadersInit = {};
   const forwardHeaders = ["content-type", "accept", "authorization"];
@@ -28,11 +28,19 @@ async function proxy(
       ? await req.text()
       : undefined;
 
-  const response = await fetch(targetUrl, {
-    method: req.method,
-    headers,
-    body,
-  });
+  let response;
+  try {
+    response = await fetch(targetUrl, {
+      method: req.method,
+      headers,
+      body,
+    });
+  } catch (err: any) {
+    return new Response(
+      JSON.stringify({ error: "Proxy request failed", details: err.message }),
+      { status: 500, headers: { "Content-Type": "application/json" } }
+    );
+  }
 
   let resBody: unknown;
   try {
@@ -53,7 +61,6 @@ export async function GET(req: NextRequest, ctx: any) {
 export async function POST(req: NextRequest, ctx: any) {
   return proxy(req, ctx);
 }
-
 export async function PATCH(req: NextRequest, ctx: any) {
   return proxy(req, ctx);
 }
