@@ -1,13 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest } from "next/server";
 
-const API_URL = "https://m-backend.dowinnsys.com";
-
-async function proxy(req: NextRequest, context: any) {
-  const { path } = (await context.params) as { path: string[] };
+async function proxy(
+  req: NextRequest,
+  context: { params: { path: string[] } }
+) {
+  const { path } = context.params;
 
   const search = req.nextUrl.searchParams.toString();
-  const targetUrl = `${API_URL}/${path.join("/")}${search ? `?${search}` : ""}`;
+  const targetUrl = `${process.env.API_URL!.replace(/\/$/, "")}/${path.join(
+    "/"
+  )}${search ? `?${search}` : ""}`;
 
   const headers: HeadersInit = {};
   const forwardHeaders = ["content-type", "accept", "authorization"];
@@ -17,8 +20,8 @@ async function proxy(req: NextRequest, context: any) {
     if (val) headers[h] = val;
   });
 
-  headers["Origin"] = API_URL;
-  headers["Referer"] = API_URL;
+  headers["Origin"] = process.env.API_URL ?? "https://m-backend.dowinnsys.com";
+  headers["Referer"] = process.env.API_URL ?? "https://m-backend.dowinnsys.com";
 
   const body =
     req.method !== "GET" && req.method !== "HEAD"
@@ -50,10 +53,11 @@ export async function GET(req: NextRequest, ctx: any) {
 export async function POST(req: NextRequest, ctx: any) {
   return proxy(req, ctx);
 }
-export async function PUT(req: NextRequest, ctx: any) {
+
+export async function PATCH(req: NextRequest, ctx: any) {
   return proxy(req, ctx);
 }
-export async function PATCH(req: NextRequest, ctx: any) {
+export async function PUT(req: NextRequest, ctx: any) {
   return proxy(req, ctx);
 }
 export async function DELETE(req: NextRequest, ctx: any) {
