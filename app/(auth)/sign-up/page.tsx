@@ -12,15 +12,18 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useState } from "react";
-import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
+import { signUpUser } from "@/app/services/api";
+import { useRouter } from "next/navigation";
+import { toast, ToastContainer } from "react-toastify";
 
 export default function SignIn() {
-
+    const [userId, setUserId] = useState("")
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
+    const router = useRouter();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -28,20 +31,18 @@ export default function SignIn() {
         setError("");
 
         try {
-            const user_id = uuidv4();
-            const res = await axios.post(
-                "/api/proxy/test01/create_member",
-                {
-                    user_id,
-                    email,
-                    password,
-                },
-            );
-            const message = res.data?.data; // 👈 capture backend message
-            alert(message);
+            const res = await signUpUser(userId, email, password);
+            if (res.status === 201) {
+                document.cookie = `auth_token=${userId}; path=/;`;
+                router.push("/projects");
+                toast.success("Sign Up Successfully!", {
+                    position: "top-right",
+                    autoClose: 1500
+                });
+            }
         } catch (err: unknown) {
             if (axios.isAxiosError(err)) {
-                setError(err.response?.data || "Unexpected error");
+                setError(err.response?.data || "Unexpected error. Please try again later.");
             } else {
                 setError("Unexpected error");
             }
@@ -53,6 +54,7 @@ export default function SignIn() {
     };
 
     return <div className="w-full mt-20 flex justify-center items-center">
+        <ToastContainer />
         <Card className="w-full max-w-sm">
             <form onSubmit={handleSubmit}>
                 <CardHeader>
@@ -63,10 +65,21 @@ export default function SignIn() {
                 </CardHeader>
                 <CardContent>
                     {error && (
-                        <div className="text-sm text-red-500 text-center">{error}</div>
+                        <div className="text-sm text-red-500 text-center mt-4">{error}</div>
                     )}
 
                     <div className="flex flex-col gap-6 mt-4">
+                        <div className="grid gap-2">
+                            <Label htmlFor="userId">User ID</Label>
+                            <Input
+                                type="text"
+                                placeholder="User Id"
+                                value={userId}
+                                onChange={(e) => setUserId(e.target.value)}
+                                required
+                                id="userId"
+                            />
+                        </div>
                         <div className="grid gap-2">
                             <Label htmlFor="email">Email</Label>
                             <Input

@@ -15,6 +15,7 @@ import { useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { toast, ToastContainer } from "react-toastify";
+import { signInUser } from "@/app/services/api";
 
 export default function SignIn() {
     const [user_id, setUser_Id] = useState("");
@@ -29,28 +30,22 @@ export default function SignIn() {
         setError("");
 
         try {
-            const res = await axios.post("/api/proxy/testlogin", {
-                user_id,
-                password,
-            },
-                { withCredentials: true }
-            );
+            const res = await signInUser(user_id, password);
             if (res.status === 201) {
                 document.cookie = `auth_token=${user_id}; path=/;`;
                 router.push("/projects");
                 toast.success("Sign In Successfully!", {
-                    position: "top-right"
+                    position: "top-right",
+                    autoClose: 1500
                 });
             }
-
         } catch (err: unknown) {
-            console.error(err);
-            if (err instanceof Error) {
-                const axiosErr = err as { response?: { data?: string } };
-                setError(axiosErr.response?.data || err.message || "Unexpected error");
+            if (axios.isAxiosError(err)) {
+                setError(err.response?.data || "Unexpected error. Please try again later.");
             } else {
                 setError("Unexpected error");
             }
+            console.error(err);
         } finally {
             setLoading(false);
         }
