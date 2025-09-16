@@ -11,7 +11,7 @@ export default function Home() {
                     <Link href="sign-in">
                         <Button>Sign In</Button>
                     </Link>
-                    <Link href="sign-ip">
+                    <Link href="sign-up">
                         <Button variant="outline">Sign Up</Button>
                     </Link>
                 </div>
