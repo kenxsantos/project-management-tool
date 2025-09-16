@@ -9,8 +9,12 @@ import { Project } from "@/interfaces";
 import { Status } from "@/lib/status";
 import { Pencil } from "lucide-react";
 import { use, useEffect, useState } from "react";
-
-import { DndContext, DragEndEvent, DragOverEvent, DragOverlay, DragStartEvent, closestCorners } from "@dnd-kit/core";
+import {
+    DndContext, DragEndEvent, DragOverEvent, DragOverlay, DragStartEvent, closestCorners, MouseSensor,
+    TouchSensor,
+    useSensor,
+    useSensors,
+} from "@dnd-kit/core";
 import TaskItem from "@/components/task-item";
 import { formatDate } from "@/lib/format-date";
 import { toast } from "sonner";
@@ -31,7 +35,8 @@ export default function ProjectPage({ params }: ProjectPageProps) {
     const [activeTaskId, setActiveTaskId] = useState<number | null>(null);
     const [overTaskId, setOverTaskId] = useState<number | null>(null);
     const { tasks } = useTasks(projectId)
-    const { moveTaskWithinColumn, moveTaskToColumn, updateTaskStatus } = useTasksStore();
+    const { moveTaskWithinColumn, moveTaskToColumn, updateTaskStatus, setTasks } = useTasksStore();
+
 
     useEffect(() => {
         const getProject = async () => {
@@ -73,7 +78,7 @@ export default function ProjectPage({ params }: ProjectPageProps) {
             if (over.data.current?.columnId) {
                 setOverTaskId(null);
             } else {
-                setOverTaskId(Number(over.id));
+                setOverTaskId(Number(over.id))
             }
         } else {
             setOverTaskId(null);
@@ -95,22 +100,42 @@ export default function ProjectPage({ params }: ProjectPageProps) {
 
         if (overTask && activeTask.status === overTask.status) {
             moveTaskWithinColumn(activeTask.status, String(active.id), String(over.id));
-        }
+        } else {
+            const newStatus =
+                overTask && activeTask.status !== overTask.status
+                    ? overTask.status
+                    : over.data.current?.columnId;
 
-        else if (overTask && activeTask.status !== overTask.status) {
-            moveTaskToColumn(activeTask, overTask);
-            await updateTaskStatus(activeTask, overTask.status);
-        }
+            if (!newStatus) return;
 
-        else if (over.data.current?.columnId) {
-            const newStatus = over.data.current.columnId;
+            setTasks((prev) =>
+                prev.map((t) =>
+                    t.id === activeTask.id ? { ...t, status: newStatus } : t
+                )
+            );
+
             await updateTaskStatus(activeTask, newStatus);
         }
     };
 
 
+    const mouseSensor = useSensor(MouseSensor, {
+        activationConstraint: {
+            distance: 5,
+        },
+    });
+
+    const touchSensor = useSensor(TouchSensor, {
+        activationConstraint: {
+            delay: 200,
+            tolerance: 5,
+        },
+    });
+
+    const sensors = useSensors(mouseSensor, touchSensor);
+
     return (
-        <div className="p-6 flex-col">
+        <div>
             {project ? (
                 <div className="space-y-4 mb-12" key={project.id}>
                     <div className="flex justify-between items-center">
@@ -159,6 +184,7 @@ export default function ProjectPage({ params }: ProjectPageProps) {
             )}
 
             <DndContext
+                sensors={sensors}
                 collisionDetection={closestCorners}
                 onDragStart={handleDragStart}
                 onDragOver={handleDragOver}
