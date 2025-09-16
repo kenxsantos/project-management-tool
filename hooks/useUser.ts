@@ -14,8 +14,13 @@ export const useUser = () => {
       try {
         const data = await getCurrentUser();
         setUsers(data);
-      } catch (err: any) {
-        setError(err.message);
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          setError("An unexpected error occurred");
+        }
+        setUsers([]);
       } finally {
         setLoading(false);
       }

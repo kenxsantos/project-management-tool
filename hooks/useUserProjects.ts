@@ -14,8 +14,13 @@ export const useUserProjects = () => {
       try {
         const data = await getAllUserProjects();
         setProjects(data);
-      } catch (err: any) {
-        setError(err.message);
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          setError("An unexpected error occurred");
+        }
+        setProjects([]);
       } finally {
         setLoading(false);
       }

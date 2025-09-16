@@ -9,19 +9,25 @@ export const useTasks = (projectId: number) => {
 
   useEffect(() => {
     const load = async () => {
-      if (tasks.length > 0) return;
       setLoading(true);
       try {
+        setTasks([]);
         const data = await fetchProjectTasks(projectId);
         setTasks(data);
-      } catch (err: any) {
-        setError(err.message);
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          setError("An unexpected error occurred");
+        }
+        setTasks([]);
       } finally {
         setLoading(false);
       }
     };
+
     load();
-  }, [tasks.length, setTasks, projectId]);
+  }, [projectId, setTasks]);
 
   return { tasks, loading, error };
 };
