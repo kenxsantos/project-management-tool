@@ -65,7 +65,7 @@ export default function Home() {
                     <p className="font-bold text-4xl uppercase mt-10 text-center">Project Management Tool</p>
                     <p className="text-gray-400 text-base text-center">by Ken Santos</p>
                 </header>
-                <div className="flex justify-between items-center mt-12 px-12">
+                <div className="flex justify-between items-center mt-12 p-2 sm:px-12">
                     <p className="text-3xl font-bold">Projects</p>
                     <Dialog open={open} onOpenChange={setOpen}>
                         <DialogTrigger asChild>
@@ -121,7 +121,7 @@ export default function Home() {
                     )
                 }
                 {projectsLoading && <p className="text-center">Loading...</p>}
-                <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 px-12 py-8">
+                <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-2 sm:px-12 py-8">
                     {
                         projects.map((project, i) => (
                             <Link href={`/projects/${project.id}`} key={i}>
