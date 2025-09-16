@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { ReactNode, useState } from "react";
+import { SquarePen } from "lucide-react";
 
 interface FormDialogProps {
     triggerLabel?: string;
@@ -41,9 +42,15 @@ export default function FormDialog({
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button variant={triggerVariant}>
-                    {triggerIcon} {triggerLabel}
-                </Button>
+                <div>
+                    <Button variant={triggerVariant} className="sm:inline-flex hidden">
+                        {triggerIcon} {triggerLabel}
+                    </Button>
+                    <Button variant="ghost" className="block sm:hidden">
+                        <SquarePen />
+                    </Button>
+                </div>
+
             </DialogTrigger>
             <DialogContent>
                 <form
