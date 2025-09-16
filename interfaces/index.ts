@@ -22,3 +22,9 @@ export interface ChangeLogs {
   remark: string;
   created_at: string;
 }
+
+export interface User {
+  id: number;
+  user_id: string;
+  email: string;
+}
