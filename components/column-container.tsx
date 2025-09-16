@@ -29,14 +29,14 @@ import TaskItem from "./task-item";
 import { Task } from "@/interfaces";
 import { useDroppable } from "@dnd-kit/core";
 import { useTasksStore } from "@/store/useTasksStore";
+
 interface ColumnContainerProps {
     status: string;
     project_id: number;
     tasks: Task[];
 }
 
-
-export default function ColumnContainer({ status, project_id, tasks }: ColumnContainerProps) {
+export default function ColumnContainer({ status, tasks, project_id }: ColumnContainerProps) {
     const [open, setOpen] = useState(false);
     const [name, setName] = useState("");
     const [content, setContent] = useState("");
@@ -44,8 +44,7 @@ export default function ColumnContainer({ status, project_id, tasks }: ColumnCon
         id: status,
         data: { columnId: status },
     });
-    const { setTasks } = useTasksStore();
-
+    const { setTasks } = useTasksStore()
 
     const handleAddTask = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -58,8 +57,8 @@ export default function ColumnContainer({ status, project_id, tasks }: ColumnCon
                     position: "top-right",
                 });
 
-                const updatedProjects = await fetchProjectTasks(project_id);
-                setTasks(updatedProjects)
+                const newData = await fetchProjectTasks(project_id);
+                setTasks(newData);
 
                 setName("");
                 setContent("");
