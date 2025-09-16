@@ -152,7 +152,12 @@ export const getAllUserProjects = async () => {
   const user = await getCurrentUser();
   const user_id = user[0].id;
 
-  return projects.filter((project: Project) => project.user_id === user_id);
+  return projects
+    .filter((project: Project) => project.user_id === user_id)
+    .sort(
+      (a: Project, b: Project) =>
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    );
 };
 
 export default api;
