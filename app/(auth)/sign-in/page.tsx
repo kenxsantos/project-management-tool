@@ -31,20 +31,25 @@ export default function SignIn() {
 
         try {
             const res = await signInUser(user_id, password);
-            if (res.status === 201) {
-                document.cookie = `auth_token=${user_id}; path=/;`;
+            if (res.data.data === "ok") {
+                document.cookie = `user_id=${user_id}; path=/;`;
                 router.push("/projects");
                 toast.success("Sign In Successfully!", {
                     position: "top-right",
                 });
+            } else if (res.data.data === "Invalid Credential") {
+                toast.error("Invalid Credentials", {
+                    position: "top-right",
+                });
             }
+
+            console.log("data: ", res.data)
         } catch (err: unknown) {
             if (axios.isAxiosError(err)) {
                 setError(err.response?.data || "Unexpected error. Please try again later.");
             } else {
                 setError("Unexpected error");
             }
-            console.error(err);
         } finally {
             setLoading(false);
         }
