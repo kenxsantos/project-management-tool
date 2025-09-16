@@ -6,8 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
-import { createChangeLog, patchTask } from "@/app/services/api";
-import { toast } from "react-toastify";
+import { createChangeLog, patchTask } from "@/services/api";
+import { toast } from "sonner";
 import { Status, StatusLabels } from "@/lib/status";
 import {
     DropdownMenu,
@@ -56,7 +56,6 @@ export default function TaskItem({ task, isOverlay = false, overTaskId }: TaskIt
             await createChangeLog(taskId, task.status, newStatus, remarks);
             toast.success("Task Updated Successfully!", {
                 position: "top-right",
-                autoClose: 1500
             });
 
             setTimeout(() => {

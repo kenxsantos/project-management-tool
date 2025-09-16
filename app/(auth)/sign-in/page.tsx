@@ -14,8 +14,8 @@ import { Label } from "@/components/ui/label"
 import { useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import { toast, ToastContainer } from "react-toastify";
-import { signInUser } from "@/app/services/api";
+import { toast } from "sonner";
+import { signInUser } from "@/services/api";
 
 export default function SignIn() {
     const [user_id, setUser_Id] = useState("");
@@ -36,7 +36,6 @@ export default function SignIn() {
                 router.push("/projects");
                 toast.success("Sign In Successfully!", {
                     position: "top-right",
-                    autoClose: 1500
                 });
             }
         } catch (err: unknown) {
@@ -54,7 +53,6 @@ export default function SignIn() {
 
     return (
         <div className="w-full mt-20 flex justify-center items-center">
-            <ToastContainer />
             <Card className="w-full max-w-sm">
                 <form onSubmit={handleSubmit}>
                     <CardHeader>

@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button"
 import { Plus } from "lucide-react";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { useState } from "react";
-import { createTask } from "@/app/services/api";
+import { createTask, fetchProjectTasks } from "@/services/api";
 import {
     Dialog,
     DialogClose,
@@ -24,19 +24,19 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog"
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "sonner";
 import TaskItem from "./task-item";
 import { Task } from "@/interfaces";
 import { useDroppable } from "@dnd-kit/core";
+import { useTasksStore } from "@/store/useTasksStore";
 interface ColumnContainerProps {
     status: string;
     project_id: number;
     tasks: Task[];
-    onTaskAdded: (task: Task) => void;
 }
 
 
-export default function ColumnContainer({ status, project_id, tasks, onTaskAdded }: ColumnContainerProps) {
+export default function ColumnContainer({ status, project_id, tasks }: ColumnContainerProps) {
     const [open, setOpen] = useState(false);
     const [name, setName] = useState("");
     const [content, setContent] = useState("");
@@ -44,6 +44,7 @@ export default function ColumnContainer({ status, project_id, tasks, onTaskAdded
         id: status,
         data: { columnId: status },
     });
+    const { setTasks } = useTasksStore();
 
 
     const handleAddTask = async (e: React.FormEvent) => {
@@ -55,14 +56,11 @@ export default function ColumnContainer({ status, project_id, tasks, onTaskAdded
             if (res.status === 201) {
                 toast.success("Task Added Successfully!", {
                     position: "top-right",
-                    autoClose: 2000,
-                    pauseOnHover: false,
                 });
-                const newTask: Task = {
-                    ...res.data.data,
-                };
 
-                onTaskAdded(newTask);
+                const updatedProjects = await fetchProjectTasks(project_id);
+                setTasks(updatedProjects)
+
                 setName("");
                 setContent("");
             }
@@ -73,8 +71,7 @@ export default function ColumnContainer({ status, project_id, tasks, onTaskAdded
 
     return (
         <div>
-            <ToastContainer />
-            <Card className="sm:w-[500px] md:w-[350px] lg:w-[500px] " ref={setNodeRef}>
+            <Card ref={setNodeRef}>
                 <CardHeader>
                     <CardTitle>{status}</CardTitle>
                 </CardHeader>
