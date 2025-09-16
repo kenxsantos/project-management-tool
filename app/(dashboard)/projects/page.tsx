@@ -1,6 +1,6 @@
 "use client"
 import Cookies from "js-cookie";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
     Card,
     CardDescription,
@@ -24,41 +24,24 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea";
-import { createProject, fetchAllProjects } from "@/app/services/api";
-import { ToastContainer, toast } from 'react-toastify';
-import { Project } from "@/interfaces";
+import { useUserProjects } from "@/hooks/useUserProjects";
+import { toast } from "sonner";
+import { createProject, getAllUserProjects } from "@/services/api";
+import { useProjectsStore } from "@/store/useProjectsStore";
 
 export default function Home() {
-    const [projects, setProjects] = useState<Project[]>([]);
-    const [loading, setLoading] = useState(true);
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
-    const userId = Cookies.get("auth_token") ?? "";
     const [open, setOpen] = useState(false);
-
-    useEffect(() => {
-        const getProjects = async () => {
-            setLoading(true);
-            try {
-                const projects = await fetchAllProjects();
-                setProjects(projects);
-            } catch (err) {
-                console.error("Failed to fetch projects", err);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        getProjects();
-    }, []);
+    const { projects, loading: projectsLoading } = useUserProjects();
+    const { setProjects } = useProjectsStore();
+    const userId = Cookies.get("user_id") ?? "No User";
 
     const handleAddProject = async (e: React.FormEvent) => {
         e.preventDefault();
-        setLoading(true);
         setOpen(false);
         try {
             const res = await createProject(userId, name, description);
-
             if (res.status === 201) {
                 toast.success("Project Added Successfully!", {
                     position: "top-right"
@@ -66,20 +49,18 @@ export default function Home() {
                 setName("");
                 setDescription("");
 
-                const projects = await fetchAllProjects();
-                setProjects(projects);
+                const updatedProjects = await getAllUserProjects();
+                setProjects(updatedProjects);
             }
+            console.log("status: ", res.status)
         } catch (err) {
             console.error("Failed to add project", err);
-        } finally {
-            setLoading(false);
         }
     };
 
     return (
         <>
             <div className="flex-col items-center justify-center">
-                <ToastContainer />
                 <header>
                     <p className="font-bold text-4xl uppercase mt-10 text-center">Project Management Tool</p>
                     <p className="text-gray-400 text-base text-center">by Ken Santos</p>
@@ -135,15 +116,15 @@ export default function Home() {
                     </Dialog>
                 </div>
                 {
-                    !loading && projects.length === 0 && (
+                    !projectsLoading && projects.length === 0 && (
                         <p className="text-center">No projects found</p>
                     )
                 }
-                {loading && <p className="text-center">Loading...</p>}
+                {projectsLoading && <p className="text-center">Loading...</p>}
                 <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 px-12 py-8">
                     {
-                        projects.map((project) => (
-                            <Link href={`/projects/${project.id}`} key={project.id}>
+                        projects.map((project, i) => (
+                            <Link href={`/projects/${project.id}`} key={i}>
                                 <Card >
                                     <CardHeader>
                                         <CardTitle>{project.name}</CardTitle>
