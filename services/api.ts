@@ -14,7 +14,7 @@ export const signInUser = async (user_id: string, password: string) => {
     { user_id, password },
     { withCredentials: true }
   );
-  return data;
+  return data.data;
 };
 
 export const signUpUser = async (
@@ -31,7 +31,7 @@ export const signUpUser = async (
     },
     { withCredentials: true }
   );
-  return data;
+  return data.data;
 };
 
 export const fetchAllMembers = async () => {
