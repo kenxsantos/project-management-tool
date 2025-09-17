@@ -35,10 +35,14 @@ export default function SignIn() {
 
         try {
             const res = await signUpUser(userId, email, password);
-            if (res.status === 201) {
-                document.cookie = `auth_token=${userId}; path=/;`;
+            if (res.data.user_id === userId) {
+                document.cookie = `user_id=${userId}; path=/;`;
                 router.push("/projects");
                 toast.success("Sign Up Successfully!", {
+                    position: "top-right",
+                });
+            } else if (res.data === "Member Already Exist") {
+                toast.error("User Already Exist", {
                     position: "top-right",
                 });
             }

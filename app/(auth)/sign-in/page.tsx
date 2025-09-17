@@ -34,13 +34,13 @@ export default function SignIn() {
 
         try {
             const res = await signInUser(user_id, password);
-            if (res.data.data === "ok") {
+            if (res.data === "ok") {
                 document.cookie = `user_id=${user_id}; path=/;`;
                 router.push("/projects");
                 toast.success("Sign In Successfully!", {
                     position: "top-right",
                 });
-            } else if (res.data.data === "Invalid Credential") {
+            } else if (res.data === "Invalid Credential") {
                 toast.error("Invalid Credentials", {
                     position: "top-right",
                 });
