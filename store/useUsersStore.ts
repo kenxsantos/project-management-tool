@@ -1,4 +1,4 @@
-import { User } from "@/types/user-data";
+import { User } from "@/interfaces";
 import { create } from "zustand";
 
 type UsersState = {
