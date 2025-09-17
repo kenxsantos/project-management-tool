@@ -29,6 +29,8 @@ import TaskItem from "./task-item";
 import { Task } from "@/interfaces";
 import { useDroppable } from "@dnd-kit/core";
 import { useTasksStore } from "@/store/useTasksStore";
+import { motion } from "framer-motion"
+
 
 interface ColumnContainerProps {
     status: string;
@@ -69,8 +71,16 @@ export default function ColumnContainer({ status, tasks, project_id }: ColumnCon
     };
 
     return (
-        <div>
-            <Card ref={setNodeRef}>
+        <motion.div
+            initial={{ opacity: 0, scale: 0 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{
+                duration: 0.4,
+                delay: 0.5,
+                scale: { type: "spring", visualDuration: 0.4, bounce: 0.5 },
+            }}
+        >
+            <Card ref={setNodeRef} className="bg-gray-100 border-none">
                 <CardHeader>
                     <CardTitle>{status}</CardTitle>
                 </CardHeader>
@@ -93,7 +103,7 @@ export default function ColumnContainer({ status, tasks, project_id }: ColumnCon
                         open={open}
                         onOpenChange={setOpen}>
                         <DialogTrigger asChild>
-                            <Button className="w-full">
+                            <Button className="w-full bg-green-600 hover:bg-green-500 cursor-pointer">
                                 <Plus /> Add Task
                             </Button>
                         </DialogTrigger>
@@ -140,6 +150,6 @@ export default function ColumnContainer({ status, tasks, project_id }: ColumnCon
                     </Dialog>
                 </CardFooter>
             </Card>
-        </div>
+        </motion.div>
     );
 }

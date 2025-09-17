@@ -28,6 +28,7 @@ import { useUserProjects } from "@/hooks/useUserProjects";
 import { toast } from "sonner";
 import { createProject, getAllUserProjects } from "@/services/api";
 import { useProjectsStore } from "@/store/useProjectsStore";
+import { motion } from 'framer-motion';
 
 export default function Home() {
     const [name, setName] = useState("");
@@ -58,20 +59,43 @@ export default function Home() {
         }
     };
 
+    const containerVariants = {
+        hidden: { opacity: 0 },
+        visible: {
+            opacity: 1,
+            transition: {
+                staggerChildren: 0.1,
+            },
+        },
+    };
+
+    const cardVariants = {
+        hidden: { opacity: 0, y: 20 },
+        visible: { opacity: 1, y: 0 },
+    };
+
+
     return (
-        <>
-            <div className="flex-col items-center justify-center">
+        <div className="flex-col items-center justify-center">
+            <motion.div
+                initial={{ opacity: 0, y: -30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, ease: 'easeOut', delay: 0.4 }}
+            >
                 <header>
-                    <p className="font-bold text-4xl uppercase mt-10 text-center">Project Management Tool</p>
+                    <p className="font-bold text-4xl uppercase mt-10 text-center">
+                        Project Management Tool
+                    </p>
                     <p className="text-gray-400 text-base text-center">by Ken Santos</p>
                 </header>
                 <div className="flex justify-between items-center mt-12 p-2 sm:px-12">
                     <p className="text-3xl font-bold">Projects</p>
                     <Dialog open={open} onOpenChange={setOpen}>
                         <DialogTrigger asChild>
-                            <Button>
+                            <Button className="bg-green-600 hover:bg-green-500 cursor-pointer">
                                 <Plus />
-                                New Project</Button>
+                                <span className="hidden sm:inline-flex">New Project</span>
+                            </Button>
                         </DialogTrigger>
                         <DialogContent className="sm:max-w-[425px]">
                             <form onSubmit={handleAddProject}>
@@ -91,7 +115,8 @@ export default function Home() {
                                             onChange={(e) => setName(e.target.value)}
                                             required
                                             id="name"
-                                            name="name" />
+                                            name="name"
+                                        />
                                     </div>
                                     <div className="grid gap-3">
                                         <Label htmlFor="description">Description</Label>
@@ -107,46 +132,57 @@ export default function Home() {
                                 </div>
                                 <DialogFooter className="mt-8">
                                     <DialogClose asChild>
-                                        <Button variant="outline">Cancel</Button>
+                                        <Button variant="destructive">Cancel</Button>
                                     </DialogClose>
-                                    <Button type="submit">Save</Button>
+                                    <Button type="submit" className="bg-blue-600 hover:bg-blue-500 cursor-pointer">Save</Button>
                                 </DialogFooter>
                             </form>
                         </DialogContent>
                     </Dialog>
                 </div>
-                {
-                    !projectsLoading && projects.length === 0 && (
-                        <p className="text-center">No projects found</p>
-                    )
-                }
-                {projectsLoading && <p className="text-center">Loading...</p>}
-                <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-2 sm:px-12 py-8">
-                    {
-                        projects.map((project, i) => (
-                            <Link href={`/projects/${project.id}`} key={i}>
-                                <Card >
+            </motion.div>
+
+            {!projectsLoading && projects.length === 0 && (
+                <p className="text-center">No projects found</p>
+            )}
+            {projectsLoading && <p className="text-center">Loading...</p>}
+
+            <motion.div
+                variants={containerVariants}
+                initial="hidden"
+                animate="visible"
+                className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-2 sm:px-12 py-8 "
+            >
+                {projects.map((project) => (
+                    <motion.div key={project.id} variants={cardVariants}>
+                        <Link href={`/projects/${project.id}`}>
+                            <motion.div
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.9 }}
+                            >
+                                <Card className="bg-gray-100 border-none">
                                     <CardHeader>
                                         <CardTitle>{project.name}</CardTitle>
                                         <CardDescription>{project.description}</CardDescription>
                                     </CardHeader>
                                     <CardFooter>
                                         <p className="text-right text-xs">
-                                            {new Date(project.created_at).toLocaleString("en-US", {
-                                                month: "short",
-                                                day: "numeric",
-                                                year: "numeric",
-                                                hour: "numeric",
-                                                minute: "2-digit",
-                                                hour12: true
-                                            })}</p>
+                                            {new Date(project.created_at).toLocaleString('en-US', {
+                                                month: 'short',
+                                                day: 'numeric',
+                                                year: 'numeric',
+                                                hour: 'numeric',
+                                                minute: '2-digit',
+                                                hour12: true,
+                                            })}
+                                        </p>
                                     </CardFooter>
                                 </Card>
-                            </Link>
-                        ))
-                    }
-                </div>
-            </div>
-        </>
-    );
+                            </motion.div>
+                        </Link>
+                    </motion.div>
+                ))}
+            </motion.div>
+        </div>
+    )
 }

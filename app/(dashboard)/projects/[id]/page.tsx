@@ -20,6 +20,7 @@ import { formatDate } from "@/lib/format-date";
 import { toast } from "sonner";
 import { useTasks } from "@/hooks/useTasks";
 import { useTasksStore } from "@/store/useTasksStore";
+import { motion } from "framer-motion"
 
 interface ProjectPageProps {
     params: Promise<{ id: string }>;
@@ -35,7 +36,7 @@ export default function ProjectPage({ params }: ProjectPageProps) {
     const [activeTaskId, setActiveTaskId] = useState<number | null>(null);
     const [overTaskId, setOverTaskId] = useState<number | null>(null);
     const { tasks } = useTasks(projectId)
-    const { moveTaskWithinColumn, moveTaskToColumn, updateTaskStatus, setTasks } = useTasksStore();
+    const { moveTaskWithinColumn, updateTaskStatus, setTasks } = useTasksStore();
 
 
     useEffect(() => {
@@ -135,15 +136,21 @@ export default function ProjectPage({ params }: ProjectPageProps) {
     const sensors = useSensors(mouseSensor, touchSensor);
 
     return (
-        <div>
-            {project ? (
-                <div className="space-y-4 mb-12" key={project.id}>
+        <>
+            {project && (
+                <motion.div
+                    initial={{ opacity: 0, y: -30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, ease: 'easeOut', delay: 0.4 }}
+                    className="space-y-4 mb-12" key={project.id}
+                >
                     <div className="flex justify-between items-center">
                         <h1 className="text-5xl font-bold">{project.name}</h1>
                         <FormDialog
                             triggerLabel="Edit Project"
                             triggerIcon={<Pencil />}
                             triggerVariant="default"
+                            changeBg={true}
                             title="Edit Project"
                             description="Edit your project here. Click save when you're done."
                             onSubmit={handleEditProject}
@@ -176,12 +183,9 @@ export default function ProjectPage({ params }: ProjectPageProps) {
                     <p className="text-xs">
                         {formatDate(project.created_at)}
                     </p>
-                </div>
-            ) : (
-                <div className="p-6">
-                    <p className="text-gray-500">No project found.</p>
-                </div>
-            )}
+                </motion.div>
+            )
+            }
 
             <DndContext
                 sensors={sensors}
@@ -209,6 +213,6 @@ export default function ProjectPage({ params }: ProjectPageProps) {
                     ) : null}
                 </DragOverlay>
             </DndContext>
-        </div>
+        </ >
     );
 }
