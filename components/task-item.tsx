@@ -71,12 +71,12 @@ export default function TaskItem({ task, isOverlay = false, overTaskId }: TaskIt
                 ref={setNodeRef}
                 style={style}
                 {...attributes}
-                className={`mb-2 border rounded-md p-3 transition-all duration-200 flex justify-between gap-2
+                className={`mb-2 border-white rounded-md p-3 transition-all duration-200 flex justify-between gap-2
     ${isOverlay
-                        ? "bg-white shadow-2xl scale-105 opacity-90"
+                        ? "bg-gray-300 shadow-2xl scale-105 opacity-90"
                         : parseInt(task.id) === overTaskId
-                            ? "bg-gray-200 blur-[2px] opacity-70"
-                            : "bg-gray-100"
+                            ? "bg-gray-400 blur-[2px] opacity-70"
+                            : "bg-white"
                     }`}>
                 <div  {...listeners} className=" items-center flex justify-center cursor-grab">
                     <GripVertical />

@@ -17,7 +17,7 @@ export function AppSidebar() {
     const pathname = usePathname();
     return (
         <Sidebar>
-            <SidebarContent>
+            <SidebarContent className="bg-white">
                 <SidebarGroup>
                     <SidebarGroupLabel>Project Management Tool</SidebarGroupLabel>
                     <SidebarGroupContent>
@@ -31,8 +31,8 @@ export function AppSidebar() {
                                     <SidebarMenuItem key={project.id}>
                                         <Link href={`/projects/${project.id}`}>
                                             <div
-                                                className={`border rounded-md p-4 flex-col cursor-pointer transition
-                          ${isActive ? "bg-blue-100 border-blue-500" : "hover:bg-gray-100"}
+                                                className={`border rounded-md p-4 flex-col cursor-pointer transition 
+                          ${isActive ? "bg-gray-100 border-gray-100" : "hover:bg-gray-100"}
                         `}
                                             >
                                                 <p className="font-bold text-sm">{project.name}</p>
