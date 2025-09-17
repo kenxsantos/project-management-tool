@@ -16,6 +16,9 @@ import axios from "axios";
 import { signUpUser } from "@/services/api";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import Image from "next/image";
+import Link from "next/link";
+import { motion } from 'framer-motion';
 
 export default function SignIn() {
     const [userId, setUserId] = useState("")
@@ -52,68 +55,95 @@ export default function SignIn() {
 
     };
 
-    return <div className="w-full mt-20 flex justify-center items-center">
-        <Card className="w-full max-w-sm">
-            <form onSubmit={handleSubmit}>
-                <CardHeader>
-                    <CardTitle>Create an account</CardTitle>
-                    <CardDescription>
-                        Please fill all the required fields.
-                    </CardDescription>
-                </CardHeader>
-                <CardContent>
-                    {error && (
-                        <div className="text-sm text-red-500 text-center mt-4">{error}</div>
-                    )}
+    return (
+        <motion.div
+            initial={{ opacity: 0, y: -30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: 'easeOut' }}
+            className="w-full mt-20 flex justify-center items-center"
+        >
+            <div className="flex flex-col sm:flex-row bg-white border shadow-lg rounded-xl overflow-hidden">
+                <div className="sm:w-1/2 w-full">
+                    <Image
+                        src="/register.jpg"
+                        width={500}
+                        height={500}
+                        alt="login"
+                        className="object-cover h-full w-full"
+                    />
+                </div>
+                <div className="sm:w-1/2 w-full p-6 flex flex-col justify-center">
+                    <Card className="w-full shadow-none border-none">
+                        <form onSubmit={handleSubmit}>
+                            <CardHeader>
+                                <CardTitle>Create an account</CardTitle>
+                                <CardDescription>
+                                    Please fill all the required fields.
+                                </CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                {error && (
+                                    <div className="text-sm text-red-500 text-center mt-4">{error}</div>
+                                )}
 
-                    <div className="flex flex-col gap-6 mt-4">
-                        <div className="grid gap-2">
-                            <Label htmlFor="userId">User ID</Label>
-                            <Input
-                                type="text"
-                                placeholder="User Id"
-                                value={userId}
-                                onChange={(e) => setUserId(e.target.value)}
-                                required
-                                id="userId"
-                            />
-                        </div>
-                        <div className="grid gap-2">
-                            <Label htmlFor="email">Email</Label>
-                            <Input
-                                type="email"
-                                placeholder="Email"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                required
-                                id="email"
-                            />
-                        </div>
-                        <div className="flex flex-col gap-6">
-                            <div className="grid gap-2">
-                                <Label htmlFor="password">Password</Label>
-                                <Input id="password" type="password"
-                                    placeholder="Password"
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    required
-                                />
-                            </div>
-                        </div>
-                    </div>
+                                <div className="flex flex-col gap-6 mt-4">
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="userId">User ID</Label>
+                                        <Input
+                                            type="text"
+                                            placeholder="User Id"
+                                            value={userId}
+                                            onChange={(e) => setUserId(e.target.value)}
+                                            required
+                                            id="userId"
+                                        />
+                                    </div>
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="email">Email</Label>
+                                        <Input
+                                            type="email"
+                                            placeholder="Email"
+                                            value={email}
+                                            onChange={(e) => setEmail(e.target.value)}
+                                            required
+                                            id="email"
+                                        />
+                                    </div>
+                                    <div className="flex flex-col gap-6">
+                                        <div className="grid gap-2">
+                                            <Label htmlFor="password">Password</Label>
+                                            <Input id="password" type="password"
+                                                placeholder="Password"
+                                                value={password}
+                                                onChange={(e) => setPassword(e.target.value)}
+                                                required
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            </CardContent>
+                            <CardFooter className="flex-col mt-4">
+                                <Button
+                                    type="submit"
+                                    className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                                    disabled={loading}>
+                                    {loading ? "Signing up..." : "Sign Up"}
+                                </Button>
+                            </CardFooter>
+                        </form>
+                        <CardAction className="w-full flex items-center justify-center text-center">
+                            <Link href="/sign-in">
+                                <p className="text-xs">
+                                    Already have an account?
+                                    <span className="text-blue-600  hover:underline"> Sign In</span>
+                                </p>
+                            </Link>
+                        </CardAction>
+                    </Card>
+                </div>
+            </div>
 
-                </CardContent>
-                <CardFooter className="flex-col mt-4">
-                    <Button type="submit" className="w-full" disabled={loading}>
-                        {loading ? "Signing up..." : "Sign Up"}
-                    </Button>
-                </CardFooter>
-            </form>
-            <CardAction className="w-full flex items-center justify-center text-center">
-                <a href="sign-in" className="text-sm text-center">Already have an account? Sign in</a>
-            </CardAction>
-        </Card>
-
-    </div>
+        </motion.div>
+    )
 
 }
