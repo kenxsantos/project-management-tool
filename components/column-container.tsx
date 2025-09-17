@@ -29,7 +29,7 @@ import TaskItem from "./task-item";
 import { Task } from "@/interfaces";
 import { useDroppable } from "@dnd-kit/core";
 import { useTasksStore } from "@/store/useTasksStore";
-import { motion } from "framer-motion"
+import { motion } from "motion/react";
 
 
 interface ColumnContainerProps {

@@ -28,7 +28,7 @@ import { useUserProjects } from "@/hooks/useUserProjects";
 import { toast } from "sonner";
 import { createProject, getAllUserProjects } from "@/services/api";
 import { useProjectsStore } from "@/store/useProjectsStore";
-import { motion } from 'framer-motion';
+import { motion } from "motion/react";
 
 export default function Home() {
     const [name, setName] = useState("");
