@@ -10,11 +10,13 @@ The frontend is built with Next.js and uses a **Next.js API proxy** to securely 
 
 🔗 **Project Link Demo**: [ProManTool](https://promantool.vercel.app/)  
 ---
-## ⬆️ Improvements
-- ✨ Implemented smooth page-load animations to enhance user experience and visual appeal.
-- 🎨 Improve UI design and improved responsiveness across devices.
-- 🛠️ Resolved task addition bug, ensuring seamless task creation and accurate state updates.
-- ⚡ Integrated Zustand for state management, enabling optimistic UI updates and faster interactions.
+## ⬆️ Improvements & Fixes
+- Implemented smooth page-load animations to enhance user experience.
+- Improve UI design and improved responsiveness across devices.
+- Resolved task addition bug, ensuring seamless task creation and accurate state updates.
+- Integrated Zustand for state management, enabling optimistic UI updates and faster interactions.
+- Add dnd-kit sensors to move task item to different devices.
+- Sort the list of projects to the ascending order (latest).
 
 ## ⚙️ Tech Stack  
 - **Frontend**: Next.js / React, TailwindCSS, Framer Motion, Axios
