@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button"
 import { Plus } from "lucide-react";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { useState } from "react";
-import { createTask } from "@/app/services/api";
+import { createTask, fetchProjectTasks } from "@/services/api";
 import {
     Dialog,
     DialogClose,
@@ -24,19 +24,21 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog"
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "sonner";
 import TaskItem from "./task-item";
 import { Task } from "@/interfaces";
 import { useDroppable } from "@dnd-kit/core";
+import { useTasksStore } from "@/store/useTasksStore";
+import { motion } from "motion/react";
+
+
 interface ColumnContainerProps {
     status: string;
     project_id: number;
     tasks: Task[];
-    onTaskAdded: (task: Task) => void;
 }
 
-
-export default function ColumnContainer({ status, project_id, tasks, onTaskAdded }: ColumnContainerProps) {
+export default function ColumnContainer({ status, tasks, project_id }: ColumnContainerProps) {
     const [open, setOpen] = useState(false);
     const [name, setName] = useState("");
     const [content, setContent] = useState("");
@@ -44,7 +46,7 @@ export default function ColumnContainer({ status, project_id, tasks, onTaskAdded
         id: status,
         data: { columnId: status },
     });
-
+    const { setTasks } = useTasksStore()
 
     const handleAddTask = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -55,14 +57,11 @@ export default function ColumnContainer({ status, project_id, tasks, onTaskAdded
             if (res.status === 201) {
                 toast.success("Task Added Successfully!", {
                     position: "top-right",
-                    autoClose: 2000,
-                    pauseOnHover: false,
                 });
-                const newTask: Task = {
-                    ...res.data.data,
-                };
 
-                onTaskAdded(newTask);
+                const newData = await fetchProjectTasks(project_id);
+                setTasks(newData);
+
                 setName("");
                 setContent("");
             }
@@ -72,9 +71,16 @@ export default function ColumnContainer({ status, project_id, tasks, onTaskAdded
     };
 
     return (
-        <div>
-            <ToastContainer />
-            <Card className="sm:w-[500px] md:w-[350px] lg:w-[500px] " ref={setNodeRef}>
+        <motion.div
+            initial={{ opacity: 0, scale: 0 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{
+                duration: 0.4,
+                delay: 0.5,
+                scale: { type: "spring", visualDuration: 0.4, bounce: 0.5 },
+            }}
+        >
+            <Card ref={setNodeRef} className="bg-gray-100 border-none">
                 <CardHeader>
                     <CardTitle>{status}</CardTitle>
                 </CardHeader>
@@ -97,7 +103,7 @@ export default function ColumnContainer({ status, project_id, tasks, onTaskAdded
                         open={open}
                         onOpenChange={setOpen}>
                         <DialogTrigger asChild>
-                            <Button className="w-full">
+                            <Button className="w-full bg-green-600 hover:bg-green-500 cursor-pointer">
                                 <Plus /> Add Task
                             </Button>
                         </DialogTrigger>
@@ -144,6 +150,6 @@ export default function ColumnContainer({ status, project_id, tasks, onTaskAdded
                     </Dialog>
                 </CardFooter>
             </Card>
-        </div>
+        </motion.div>
     );
 }

@@ -10,19 +10,20 @@ import {
     SidebarMenuItem,
 } from "@/components/ui/sidebar"
 import Link from "next/link";
-import { Project } from "@/interfaces";
+import { useUserProjects } from "@/hooks/useUserProjects";
 
-export function AppSidebar({ projects }: { projects: Project[] }) {
+export function AppSidebar() {
+    const { projects } = useUserProjects();
     const pathname = usePathname();
     return (
         <Sidebar>
-            <SidebarContent>
+            <SidebarContent className="bg-white">
                 <SidebarGroup>
                     <SidebarGroupLabel>Project Management Tool</SidebarGroupLabel>
                     <SidebarGroupContent>
                         <SidebarMenu>
                             {projects.length === 0 && (
-                                <SidebarMenuItem>No projects found</SidebarMenuItem>
+                                <SidebarMenuItem><p className="text-center">No projects found</p></SidebarMenuItem>
                             )}
                             {projects.map((project) => {
                                 const isActive = pathname === `/projects/${project.id}`;
@@ -30,8 +31,8 @@ export function AppSidebar({ projects }: { projects: Project[] }) {
                                     <SidebarMenuItem key={project.id}>
                                         <Link href={`/projects/${project.id}`}>
                                             <div
-                                                className={`border rounded-md p-4 flex-col cursor-pointer transition
-                          ${isActive ? "bg-blue-100 border-blue-500" : "hover:bg-gray-100"}
+                                                className={`border rounded-md p-4 flex-col cursor-pointer transition 
+                          ${isActive ? "bg-gray-100 border-gray-100" : "hover:bg-gray-100"}
                         `}
                                             >
                                                 <p className="font-bold text-sm">{project.name}</p>

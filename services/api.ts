@@ -1,5 +1,7 @@
-import { ChangeLogs, Task } from "@/interfaces";
+import { ChangeLogs, Task, User, Project } from "@/interfaces";
+
 import axios from "axios";
+import Cookies from "js-cookie";
 
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
@@ -12,7 +14,7 @@ export const signInUser = async (user_id: string, password: string) => {
     { user_id, password },
     { withCredentials: true }
   );
-  return data;
+  return data.data;
 };
 
 export const signUpUser = async (
@@ -29,13 +31,14 @@ export const signUpUser = async (
     },
     { withCredentials: true }
   );
-  return data;
+  return data.data;
 };
 
 export const fetchAllMembers = async () => {
   const res = await api.get("/test01/get_all_member");
   return res.data.data;
 };
+
 export const createProject = async (
   userId: string,
   name: string,
@@ -90,11 +93,9 @@ export const fetchAllTasks = async () => {
   return res.data.data;
 };
 
-export const fetchProjectTasks = async (project_id: number, status: string) => {
+export const fetchProjectTasks = async (project_id: number) => {
   const tasks = await fetchAllTasks();
-  return tasks.filter(
-    (task: Task) => task.project_id === project_id && task.status === status
-  );
+  return tasks.filter((task: Task) => task.project_id === project_id);
 };
 
 export const patchTask = async (
@@ -135,6 +136,28 @@ export const createChangeLog = async (
     remark,
   });
   return res.data;
+};
+
+//fetch current user
+export const getCurrentUser = async () => {
+  const users = await fetchAllMembers();
+  const user_id = Cookies.get("user_id") ?? "No User";
+
+  return users.filter((user: User) => user.user_id === user_id);
+};
+
+//get only project for specific user
+export const getAllUserProjects = async () => {
+  const projects = await fetchAllProjects();
+  const user = await getCurrentUser();
+  const user_id = user[0].id;
+
+  return projects
+    .filter((project: Project) => project.user_id === user_id)
+    .sort(
+      (a: Project, b: Project) =>
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    );
 };
 
 export default api;

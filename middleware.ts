@@ -7,7 +7,7 @@ export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   if (protectedRoutes.some((route) => pathname.startsWith(route))) {
-    const isLoggedIn = req.cookies.get("auth_token");
+    const isLoggedIn = req.cookies.get("user_id");
 
     if (!isLoggedIn) {
       return NextResponse.redirect(new URL("/sign-in", req.url));

@@ -10,7 +10,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { FileClock, MoveRight } from "lucide-react";
 import { useEffect, useState } from "react";
-import { fetchTasksLogs } from "@/app/services/api";
+import { fetchTasksLogs } from "@/services/api";
 import { ChangeLogs } from "@/interfaces";
 
 interface ChangeLogDialogProps {

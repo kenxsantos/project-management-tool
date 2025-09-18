@@ -6,8 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
-import { createChangeLog, patchTask } from "@/app/services/api";
-import { toast } from "react-toastify";
+import { createChangeLog, patchTask } from "@/services/api";
+import { toast } from "sonner";
 import { Status, StatusLabels } from "@/lib/status";
 import {
     DropdownMenu,
@@ -56,7 +56,6 @@ export default function TaskItem({ task, isOverlay = false, overTaskId }: TaskIt
             await createChangeLog(taskId, task.status, newStatus, remarks);
             toast.success("Task Updated Successfully!", {
                 position: "top-right",
-                autoClose: 1500
             });
 
             setTimeout(() => {
@@ -72,12 +71,12 @@ export default function TaskItem({ task, isOverlay = false, overTaskId }: TaskIt
                 ref={setNodeRef}
                 style={style}
                 {...attributes}
-                className={`mb-2 border rounded-md p-3 transition-all duration-200 flex justify-between gap-2
+                className={`mb-2 border-white rounded-md p-3 transition-all duration-200 flex justify-between gap-2
     ${isOverlay
-                        ? "bg-white shadow-2xl scale-105 opacity-90"
+                        ? "bg-gray-300 shadow-2xl scale-105 opacity-90"
                         : parseInt(task.id) === overTaskId
-                            ? "bg-gray-200 blur-[2px] opacity-70"
-                            : "bg-gray-100"
+                            ? "bg-gray-400 blur-[2px] opacity-70"
+                            : "bg-white"
                     }`}>
                 <div  {...listeners} className=" items-center flex justify-center cursor-grab">
                     <GripVertical />
