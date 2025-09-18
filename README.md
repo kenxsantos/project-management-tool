@@ -9,11 +9,15 @@ The frontend is built with Next.js and uses a **Next.js API proxy** to securely 
 
 
 🔗 **Project Link Demo**: [ProManTool](https://promantool.vercel.app/)  
-
 ---
+## ⬆️ Improvements
+- ✨ Implemented smooth page-load animations to enhance user experience and visual appeal.
+- 🎨 Improve UI design and improved responsiveness across devices.
+- 🛠️ Resolved task addition bug, ensuring seamless task creation and accurate state updates.
+- ⚡ Integrated Zustand for state management, enabling optimistic UI updates and faster interactions.
 
 ## ⚙️ Tech Stack  
-- **Frontend**: Next.js / React, TailwindCSS, Axios
+- **Frontend**: Next.js / React, TailwindCSS, Framer Motion, Axios
 - **Deployment**: Vercel  
 
 ---
@@ -50,6 +54,3 @@ npm run dev
 
 Your app should now be running on http://localhost:3000. 
 
-### 🛠 Known Issues
-
-❌ Task Creation Refresh Issue – When a user adds a new task, the page must be refreshed to reflect the update.
