@@ -17,6 +17,7 @@ The frontend is built with Next.js and uses a **Next.js API proxy** to securely 
 - Integrated Zustand for state management, enabling optimistic UI updates and faster interactions.
 - Add dnd-kit sensors to move task item to different devices.
 - Sort the list of projects to the ascending order (latest).
+- Fetch only projects belong to the user.
 
 ## ⚙️ Tech Stack  
 - **Frontend**: Next.js / React, TailwindCSS, Framer Motion, Axios
