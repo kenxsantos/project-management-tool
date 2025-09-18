@@ -21,6 +21,7 @@ import { toast } from "sonner";
 import { useTasks } from "@/hooks/useTasks";
 import { useTasksStore } from "@/store/useTasksStore";
 import { motion } from "framer-motion"
+import { useProjectsStore } from "@/store/useProjectsStore";
 
 interface ProjectPageProps {
     params: Promise<{ id: string }>;
@@ -30,7 +31,7 @@ export default function ProjectPage({ params }: ProjectPageProps) {
     const { id } = use(params);
     const projectId = parseInt(id);
     const [project, setProject] = useState<Project | null>(null);
-
+    const { updateProject } = useProjectsStore();
     const [newName, setNewName] = useState("");
     const [newDescription, setNewDescription] = useState("");
     const [activeTaskId, setActiveTaskId] = useState<number | null>(null);
@@ -56,16 +57,20 @@ export default function ProjectPage({ params }: ProjectPageProps) {
 
     const handleEditProject = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (!project) return;
+        const prev = { ...project };
+        const updated = { ...project, name: newName, description: newDescription };
+        setProject(updated);
+        updateProject(updated);
+
         try {
             await patchProject(projectId, newName, newDescription);
-            toast.success("Project Updated Successfully!", {
-                position: "top-right",
-            });
-            setTimeout(() => {
-                window.location.reload();
-            }, 1500);
+            toast.success("Project Updated Successfully!", { position: "top-right" });
         } catch (err) {
             console.error("Failed to update project", err);
+            toast.error("Failed to update project. Rolling back.", { position: "top-right" });
+            setProject(prev);
+            updateProject(prev);
         }
     };
 
